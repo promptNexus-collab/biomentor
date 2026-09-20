@@ -1,38 +1,34 @@
 # BioMentor — Intelligence Layer
 
-## Messy Inputs
-- Student selects a topic → AI must generate structured lesson from topic name + difficulty.
-- Quiz answers → AI must evaluate and recommend next steps from raw score + topic.
+## Messy inputs
+Topic name (free text), optional difficulty + student's last score. No structured profile yet.
 
-## Auto-Structure Schema (quiz question JSON)
+## Auto-structure schema (lesson generation response)
 ```json
 {
-  "questions": [
-    {
-      "question": "Where does the light-dependent reaction occur?",
-      "options": ["Stroma", "Thylakoid membrane", "Nucleus", "Cytoplasm"],
-      "correct_index": 1,
-      "explanation": "Thylakoid membranes contain chlorophyll and host the light-dependent reactions."
-    }
+  "title": "Photosynthesis: Light into Life",
+  "content": "...structured lesson markdown...",
+  "visual_summary": "Chloroplast captures sunlight; splits H2O; makes glucose + O2",
+  "quiz": [
+    {"question": "...", "options": ["a","b","c","d"], "correct_answer": "b", "explanation": "..."}
+  ],
+  "next_steps": [
+    {"title": "...", "description": "...", "rationale": "score < 60%"}
   ]
 }
 ```
 
-## Events to Track
-- `lesson_generated` — topic_id, lesson_id, source, confidence
-- `quiz_generated` — lesson_id, quiz_id, question_count
-- `quiz_attempt_submitted` — quiz_id, attempt_id, score
-- `study_plan_generated` — attempt_id, plan_id
+## Events to track
+- lesson_generated (topic_id, source, confidence)
+- quiz_started, quiz_submitted (score, total)
+- study_step_viewed, study_step_completed (later)
 
-## Scoring Rules (rule-based, v1)
-- Quiz score = correct answers / total questions (0.0 – 1.0)
-- Mastery threshold: score ≥ 0.8 → "Mastered"
-- Review threshold: 0.5 ≤ score < 0.8 → "Review needed"
-- Remediate threshold: score < 0.5 → "Remediate"
+## Scoring rules (v1, rule-based)
+- quiz score = correct / total × 100
+- next-step ranking: score ≥ 80% → advanced topic (difficulty up one level); 50-79% → revisit subtopics; <50% → foundational review + same-topic retry.
 
-## What Gets Ranked
-Recommended next steps ranked by: (1) relevance to weakest quiz question's topic sub-area, (2) difficulty step-down if score < 0.5, (3) prerequisite topics.
+## What gets ranked
+Next steps ordered by: relevance to weak quiz questions first, then difficulty progression.
 
-## v1 vs Later
-**v1:** AI lesson generation, quiz generation, rule-based scoring, AI next-step recommendations.
-**Later:** Adaptive difficulty based on attempt history, spaced repetition scheduling, teacher override of AI content, confidence-weighted question selection.
+## v1 vs later
+v1: rule-based scoring + AI generation. Later: per-student mastery model, spaced repetition, adaptive difficulty from history.

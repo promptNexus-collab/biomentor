@@ -1,27 +1,25 @@
 # BioMentor — Test Plan
 
-## v1 Success Scenario (manual)
-1. Open app → confirm topic grid loads with 5+ topics, no login required.
-2. Click "Photosynthesis" → see topic detail page with "Generate Lesson" button.
-3. Click "Generate Lesson" → loading state shows → lesson markdown + visual summary renders.
-4. Confirm lesson is saved (refresh page → lesson persists).
-5. Click "Take Quiz" → quiz generates 3-5 questions with options.
-6. Answer questions (answer at least one wrong on purpose).
-7. Submit quiz → see instant score (e.g. 2/3) with per-question correct/incorrect.
-8. See recommended next steps (e.g. "Review light-dependent reactions").
-9. Navigate to "My Progress" → lesson, quiz attempt, and score are listed.
+## v1 success scenario (manual)
+1. Open app (logged out) → Subjects shows Biology, Botany, Microbiology.
+2. Click Botany → Topics shows Photosynthesis, Plant Reproduction, Plant Transport.
+3. Click Photosynthesis → click "Generate lesson".
+4. Lesson appears with title, content, visual summary (AI, flagged unreviewed).
+5. Quiz shows 3 questions with options.
+6. Answer questions → Submit.
+7. Score shown (e.g. 2/3) with per-question correct answer + explanation.
+8. Recommended next steps list appears (2-3 items).
+9. Refresh page → score, answers, steps persist.
 
-## Empty / Error Cases
-- **No topics returned from DB:** Topic grid shows empty state: "No topics available yet. Check back soon."
-- **AI lesson generation fails:** Show error message: "Couldn't generate the lesson. Try again." Retry button visible. Pre-seeded demo lesson still accessible.
-- **AI quiz generation fails:** Show error: "Quiz generation failed. Please retry." Pre-seeded demo quiz available as fallback.
-- **Quiz submission with no answers selected:** Disable submit button until all questions answered. Tooltip: "Please answer all questions."
-- **Network timeout during generation:** Show spinner for max 30s, then error with retry.
-- **DB write fails:** Show toast: "Something went wrong saving your progress. Please retry." No silent failure.
+## Empty states
+- New topic with no lesson → "No lesson yet. Generate one." button; no blank cards.
+- Subject page with 0 topics → "Topics coming soon."
 
-## State Coverage Checklist
-- [ ] Loading state on topic grid, lesson gen, quiz gen, quiz submit
-- [ ] Empty state on topic grid (no topics), progress page (no attempts)
-- [ ] Error state on AI generation failure, DB failure
-- [ ] Ready/ready state on all screens with seeded data
-- [ ] Partial state: quiz answered some-but-not-all questions (submit disabled)
+## Error states
+- AI generation fails → error card + "Retry" + offer to view seeded fallback lesson.
+- Submit quiz with no answers → block + message "Answer all questions."
+- DB read fails → error state, not blank screen.
+
+## Permission / basic
+- No API keys visible in browser network/client bundle.
+- Delete a lesson → confirms → row gone from DB + UI.

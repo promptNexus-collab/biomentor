@@ -1,71 +1,31 @@
 # BioMentor — Data Model
 
+All tables: `id uuid pk`, `created_at`, nullable `user_id` (owner-scoping added at lock-down), RLS enabled (v1 permissive).
+
+## subjects
+- id, name, description. Has many topics. RLS: v1 open.
+
 ## topics
-| Field | Type |
-|---|---|
-| id | uuid PK |
-| name | text |
-| subject | text (Biology / Botany) |
-| description | text |
-| icon | text (emoji or image key) |
-| difficulty | text (Beginner/Intermediate/Advanced) |
-| created_at | timestamptz |
+- id, subject_id (fk→subjects), name, description, difficulty. Belongs to subject; has many lessons.
 
 ## lessons
-| Field | Type |
-|---|---|
-| id | uuid PK |
-| topic_id | uuid → topics |
-| user_id | uuid (nullable, for future owner-scoping) |
-| content | text (markdown lesson body) |
-| visual_summary | text (simple diagram/explanation description) |
-| source | text (AI model or "seed") |
-| confidence | numeric |
-| review_status | text default 'unreviewed' |
-| created_at | timestamptz |
+- id, user_id, topic_id (fk→topics), title, content (AI), visual_summary (AI)
+- AI meta: `source`, `confidence`, `review_status` (default 'unreviewed')
+- Has many quiz_questions, quiz_attempts, study_steps.
 
-## quizzes
-| Field | Type |
-|---|---|
-| id | uuid PK |
-| lesson_id | uuid → lessons |
-| topic_id | uuid → topics |
-| questions | jsonb (array of {question, options[], correct_index, explanation}) |
-| source | text |
-| confidence | numeric |
-| review_status | text default 'unreviewed' |
-| created_at | timestamptz |
+## quiz_questions
+- id, user_id, lesson_id (fk→lessons), question, options (jsonb array), correct_answer, explanation (AI)
+- AI meta: `source`, `confidence`, `review_status`
 
 ## quiz_attempts
-| Field | Type |
-|---|---|
-| id | uuid PK |
-| quiz_id | uuid → quizzes |
-| user_id | uuid (nullable) |
-| answers | jsonb (array of selected indices) |
-| score | numeric (e.g. 0.67) |
-| total_questions | int |
-| created_at | timestamptz |
+- id, user_id, lesson_id (fk→lessons), score (numeric), total (numeric), answers (jsonb: question_id→answer). Scores never overwritten.
 
-## study_plans
-| Field | Type |
-|---|---|
-| id | uuid PK |
-| quiz_attempt_id | uuid → quiz_attempts |
-| topic_id | uuid → topics |
-| recommendations | jsonb (array of {step, reason}) |
-| source | text |
-| confidence | numeric |
-| review_status | text default 'unreviewed' |
-| created_at | timestamptz |
+## study_steps
+- id, user_id, lesson_id (fk→lessons), title, description, rationale, order_index (int)
+- AI meta: `source`, `confidence`, `review_status`
 
-## Relationships
-```
-topics 1—* lessons 1—* quizzes 1—* quiz_attempts 1—1 study_plans
-```
+## AI fields convention
+Every AI-generated value carries `source` (e.g. 'seed', 'openai'), `confidence` (0-1), `review_status` ('unreviewed'/'approved'/'rejected').
 
-## RLS / Permissions (v1 — demo-open)
-All tables: permissive select/insert/update for anonymous demo. Lock-down sprint adds `auth.uid() = user_id` scoping on lesson/quiz/attempt/plan tables.
-
-## AI Fields
-`lessons.content`, `lessons.visual_summary`, `quizzes.questions`, `study_plans.recommendations` are AI-generated → each table carries `source`, `confidence`, `review_status`.
+## Later (not in migration)
+students/teachers profiles, courses, assignments, attendance, parent_feedback, messages.

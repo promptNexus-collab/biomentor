@@ -1,34 +1,35 @@
-# BioMentor — AI Biology & Botany Learning Platform
+# BioMentor — PRD
 
 ## Problem
-Students struggle with biology and botany concepts; teachers lack tools to create personalized learning materials quickly.
+Students struggle to find personalised, visual biology/botany explanations; teachers and parents lack one place to guide and monitor learning. Generic resources aren't tailored to each learner's level or next gap.
 
-## Target User
-Students (primary), teachers, and parents. v1 focuses on students only; teacher/parent features are later.
+## Target user
+Primary (v1): students learning Biology & Botany. Later: teachers (build lessons/worksheets/assessments), parents (monitor progress, give feedback).
 
-## Core Objects
-- **Topic**: Biology/Botany subject area (e.g. Cell Structure, Photosynthesis)
-- **Lesson**: AI-generated personalized lesson for a topic
-- **Quiz**: AI-generated quiz with questions tied to a lesson
-- **QuizAttempt**: Student's answers + score for a quiz
-- **StudyPlan**: Recommended next steps based on quiz results
+## Core objects (v1)
+- **Subject** — Biology, Botany, Microbiology
+- **Topic** — e.g. Photosynthesis, Cell Structure (difficulty: beginner/intermediate)
+- **Lesson** — AI-generated title, content, visual_summary
+- **QuizQuestion** — question, options, correct_answer, explanation
+- **QuizAttempt** — score, total, answers
+- **StudyStep** — recommended next study step per lesson
 
-## MVP (v1) — Checklist
-- [ ] Browse and select a Biology/Botany topic from seeded list
-- [ ] Generate an AI lesson with visual explanation for selected topic
-- [ ] Generate a short quiz (3-5 questions) for that lesson
-- [ ] Take the quiz, submit answers, get instant score
-- [ ] Receive recommended next study steps based on score
-- [ ] All persists to database; works without login
+Secondary (later, not built now): student/teacher profiles, courses, assignments, attendance, parent feedback, messaging.
+
+## MVP (v1) — must-haves
+- [ ] Browse subjects + topics
+- [ ] Generate a personalised lesson for a chosen topic (content + visual summary)
+- [ ] Auto-generate a short quiz (3-5 questions)
+- [ ] Student takes quiz → instant score + per-question explanation
+- [ ] Show recommended next study steps based on score
+- [ ] All screens viewable without login (seed demo data); create/edit/delete works
+- [ ] Empty / loading / error states handled on every screen
 
 ## Non-goals (v1)
-- Login / signup / auth
-- Teacher lesson builder / worksheets
-- Parent monitoring dashboard
-- Attendance tracking
-- Student-teacher messaging
-- Payment / billing
-- Spaced repetition / adaptive scheduling
+- Login/signup & per-user data isolation (later sprint)
+- Teacher lesson-builder, worksheets, assessments
+- Parent dashboard & progress monitoring
+- Attendance, messaging, billing
 
-## Success Criteria
-A student opens the app (no login), picks "Photosynthesis," sees a personalized lesson with a simple visual diagram explanation, completes a 3-question quiz, gets an instant score (e.g. 2/3), and sees recommended next steps like "Review light-dependent reactions." The entire flow works in one session and all data is saved.
+## Success criteria (one concrete end-to-end scenario)
+A student opens the app with no login, selects Botany → Photosynthesis, receives a generated lesson with a visual explanation, completes a 3-question quiz, sees their score (e.g. 2/3) with explanations, and receives 2-3 recommended next steps. Every action persists to the database and the UI reflects it.

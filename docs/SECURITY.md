@@ -1,20 +1,16 @@
 # BioMentor — Security
 
-## Secret Handling
-- OpenAI API key stored in Supabase Edge Function env vars / Vercel env vars only — never in client code, never in `NEXT_PUBLIC_*`.
-- All AI calls happen server-side (server actions or route handlers). Client never sees the API key.
+## Secret handling
+AI API keys live in server env vars only (Vercel/Supabase); never imported client-side; all AI calls through server actions. No keys in repo or client bundle.
 
-## Permission Model (v1 → target)
-**v1 (demo):** All tables permissive — anonymous users can browse topics, generate lessons, take quizzes. No login required.
-**Target (lock-down sprint):**
-- `lessons`, `quizzes`, `quiz_attempts`, `study_plans` scoped by `auth.uid() = user_id`.
-- `topics` remain readable by all (shared catalog).
-- Students see only their own lessons/attempts/plans.
-- Teachers (future role) can read class-related data.
-- Parents (future role) can read their child's progress (read-only).
+## Permission model
+v1: open read/write (demo-first, anonymous). Lock-down sprint: RLS owner-scoped — users see only rows where `auth.uid() = user_id`; shared seed rows flagged public. Agent inherits the caller's permissions; cannot write as another user.
 
-## Approved-Tools Rule
-Only named tools are callable by the AI: `generate_lesson`, `generate_quiz`, `score_quiz`, `generate_study_plan`. No generic SQL execution, no raw API calls, no file system access.
+## Approved-tools rule
+Agent may only call named tools (`generate_lesson`, `grade_quiz`, `recommend_steps`). No raw `run_any`/`send_any`; no arbitrary SQL execution from AI output — all DB writes go through the data-access layer.
 
-## Audit Principle
-Every AI generation and quiz submission is logged to `audit_logs` with action name, actor, target, tool, status, and timestamp. This survives refresh and provides a traceable history of what the AI produced and when.
+## Audit principle
+Every meaningful action (lesson generated, quiz submitted, steps generated) writes an audit row with who/what/when. Scores are never silently mutated; corrections create a new attempt, never overwrite.
+
+## Honest note
+Per-user RLS and account security are NOT done in v1 — the app is openly demoable. Before real student data is stored, complete the lock-down sprint. If unsure about RLS correctness, stop and get a human to verify the policies.

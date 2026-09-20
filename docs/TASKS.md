@@ -1,67 +1,45 @@
-# BioMentor — Tasks & Sprints
+# BioMentor — Tasks
 
-## Sprint 1 — Database + Topic Browser
-**Goal:** DB schema live, topics seeded, topic grid renders without login.
-- [ ] Create Supabase tables + RLS (permissive) + seed data (migration SQL)
-- [ ] Build `lib/data/topics.ts` — fetch topics from DB
-- [ ] Build topic grid page (`/topics`) — cards with name, subject, difficulty, icon
-- [ ] Loading / empty / error states on topic grid
-- [ ] Responsive sidebar shell (desktop sidebar, mobile hamburger)
-- **DoD:** Open app → see 5+ seeded biology/botany topics as cards. No login.
+## Sprint 1 — Foundation (DB + browse, no login)
+Goal: app renders with seed data; subjects/topics/lessons browsable.
+- [ ] Migration: subjects, topics, lessons, quiz_questions, quiz_attempts, study_steps + RLS + seeds
+- [ ] Build `lib/data` access layer for all tables
+- [ ] Subjects list + Topic list pages
+- [ ] Lesson detail page renders seeded content + visual summary
+- [ ] Responsive sidebar shell (desktop sidebar / mobile hamburger)
+DoD: anonymous visitor sees seeded Biology/Botany topics and a full seeded lesson with quiz questions, no login.
 
-## Sprint 2 — Lesson Generation (core engine)
-**Goal:** Student selects topic → AI generates and saves lesson.
-- [ ] Build `lib/ai/lessonGen.ts` — call OpenAI, return markdown + visual summary
-- [ ] Build `lib/data/lessons.ts` — insert/fetch lessons
-- [ ] Build server action `generateLesson(topicId)`
-- [ ] Build topic detail page with "Generate Lesson" button → lesson renders
-- [ ] Loading / error / partial states during generation
-- [ ] Seed at least one pre-generated demo lesson so page works without AI
-- **DoD:** Click topic → see AI-generated lesson with visual explanation, persisted to DB.
+## Sprint 2 — Core engine (v1 functional milestone)
+Goal: full one-workflow loop works end-to-end.
+- [ ] `lib/ai`: generate_lesson tool (content + visual_summary)
+- [ ] Save generated lesson + auto-generated quiz to DB
+- [ ] Quiz-taking UI → grade_quiz server action → save quiz_attempt
+- [ ] recommend_steps (rule-based) → save study_steps → display
+- [ ] "Generate lesson" button wired to real DB writes
+DoD: student picks Photosynthesis → gets AI lesson → takes 3-question quiz → sees score + explanations + next steps; persists; refresh keeps state. ← **v1 functional**
 
-## Sprint 3 — Quiz Generation + Taking + Scoring
-**Goal:** Student takes a quiz on the lesson and gets an instant score.
-- [ ] Build `lib/ai/quizGen.ts` — generate 3-5 questions as structured JSON
-- [ ] Build `lib/data/quizzes.ts` + `lib/data/attempts.ts`
-- [ ] Build server action `generateQuiz(lessonId)` and `submitQuiz(quizId, answers)`
-- [ ] Build quiz-taking UI — question cards, option selection, submit
-- [ ] Score computed (rule-based), saved to `quiz_attempts`
-- [ ] Show score + per-question correctness
-- [ ] Loading / empty / error states
-- **DoD:** After lesson, click "Take Quiz" → answer 3-5 questions → see instant score with correct/incorrect breakdown.
+## Sprint 3 — Polish & resilience
+Goal: production-feel UX.
+- [ ] Five states on every screen (loading/empty/partial/error/ready)
+- [ ] AI failure → error card + Retry + seeded fallback lesson
+- [ ] My Progress page (recent quiz_attempts + scores)
+- [ ] Delete lesson/quiz via confirmed UI (human-only)
+- [ ] Write audit rows for lesson_generated, quiz_submitted, step_generated
+DoD: every screen handles empty + error; AI outage shows fallback; progress page lists real attempts.
 
-## Sprint 4 — Study Plan Recommendations + End-to-End Flow (v1 FUNCTIONAL)
-**Goal:** Complete the one workflow: topic → lesson → quiz → score → next steps.
-- [ ] Build `lib/ai/nextSteps.ts` — generate recommendations from score + topic
-- [ ] Build `lib/data/plans.ts` — save study plans
-- [ ] Build server action `generateStudyPlan(attemptId)`
-- [ ] Display recommendations on quiz result page
-- [ ] Add "My Progress" page — list of lessons + attempts + scores
-- [ ] Full end-to-end test of success scenario
-- **DoD (v1 milestone):** Student opens app → picks "Photosynthesis" → sees lesson → takes quiz → scores 2/3 → sees "Review light-dependent reactions" recommendation. All data in DB. No login.
-
-## Sprint 5 — Lock It Down (auth + RLS)
-**Goal:** Per-user data isolation.
-- [ ] Add Supabase Auth (signup / login)
-- [ ] Replace permissive RLS with `auth.uid() = user_id` policies on lessons, quizzes, quiz_attempts, study_plans
-- [ ] Topics remain public read
-- [ ] Redirect unauthenticated users from lesson/quiz/progress pages to login
-- [ ] Seed demo user + data for testing
-- **DoD:** Logged-in user sees only their lessons/attempts. Anonymous sees topics only.
-
-## Sprint 6+ — Later
-- Teacher lesson builder + worksheet export
-- Parent dashboard (read-only progress)
-- Student-teacher messaging
-- Attendance tracking
-- Adaptive difficulty + spaced repetition
+## Sprint 4 — Lock it down
+Goal: per-user data + accounts.
+- [ ] Supabase auth (signup/login)
+- [ ] Replace v1 permissive RLS with owner-scoped (auth.uid() = user_id)
+- [ ] Keep seed rows public/shared
+- [ ] Logged-in user sees only own attempts & steps
+- [ ] Verify RLS with a human; stop if unsure
+DoD: logged-out user sees demo only; logged-in attempts private; RLS confirmed.
 
 ## Gantt
 ```
-Sprint 1: DB + Topics          ████
-Sprint 2: Lesson Generation    ████
-Sprint 3: Quiz + Scoring      ████
-Sprint 4: Study Plan + E2E    ████  ← v1 functional milestone
-Sprint 5: Lock Down (Auth)     ████
-Sprint 6+: Later features     ████
+S1 ████████ DB + browse (no login)
+S2 ████████ Core engine → v1 functional
+S3 ████████ Polish & resilience
+S4 ████████ Auth + RLS lock-down
 ```

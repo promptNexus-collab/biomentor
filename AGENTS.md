@@ -1,6 +1,6 @@
 # biomentor
 
-AI-powered biology/botany learning platform where students pick a topic, get a personalized AI lesson with visual explanation, take a quiz, score instantly, and receive recommended next study steps.
+AI-powered Biology & Botany learning platform: a student picks a topic, gets a personalised AI lesson with a visual explanation, takes a short quiz, sees an instant score, and receives recommended next study steps.
 
 ## ⚠️ READ THIS BEFORE WRITING ANY CODE
 A complete, correct plan for this app is already committed in `/docs`. Do **not** start
@@ -46,8 +46,10 @@ build the wrong thing (e.g. a marketing landing page). Open the plan and build f
   the next deploy.
 - **The Supabase database is already provisioned** and its keys are in this project's Vercel
   env. Pull them locally: `vercel link` then `vercel env pull .env.local`. Don't invent new ones.
-- **Database-first:** turn your data model into a Supabase migration and apply it BEFORE
-  building features. Do not build local-only / in-memory.
+- **Your database is already set up.** The schema from your data model has been applied to
+  this project's Supabase database and committed at `supabase/migrations/0001_init.sql`. Build on
+  the existing tables — **do not recreate them**. To change the schema, add a NEW migration file
+  (`supabase/migrations/0002_*.sql`) and apply it; never edit `0001`.
 - **Commit as your GitHub identity, or Vercel will block the deploy.** Vercel verifies that
   every commit's author email belongs to your GitHub account. Your machine's default git email
   often isn't, so the very first local commit gets rejected. Pin this repo's identity once
